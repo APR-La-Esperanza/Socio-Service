@@ -6,9 +6,9 @@ spring:
     name: socio-service
 
   datasource:
-    url: jdbc:postgresql://ep-fancy-block-aq9r6h7v-pooler.c-8.us-east-1.aws.neon.tech/apr_socio_db?sslmode=require
+    url: jdbc:postgresql://ep-sparkling-fog-aqjfhggu-pooler.c-8.us-east-1.aws.neon.tech/apr_socio_db?sslmode=require
     username: neondb_owner
-    password: npg_WXj4FOfCxl8E
+    password: npg_LBdpGJT3ZQ1j
 
   jpa:
     hibernate:
