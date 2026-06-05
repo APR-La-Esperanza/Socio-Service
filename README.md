@@ -1,1 +1,2 @@
-# Pago
+Auth-Service (puerto 8081, apr_auth_db)
+Responsabilidad: Gestión de credenciales + autenticación JWT + BCrypt. Entidad: Credencial { id, email, password(BCrypt), rol: Rol } Controller: AuthController — 7 endpoints Service: AuthService — métodos: listarTodos(), buscarPorId(), guardar(), actualizar(), eliminar(), login(), validarToken() Repository: CredencialRepository — métodos custom: findByEmail(), existsByEmail() DTOs: CredencialDTO (request), CredencialResponseDTO (response), LoginDTO, TokenDTO Dependencias externas: Ninguna (sin WebClient). Es el único servicio completamente independiente. Tabla BD: credenciales
