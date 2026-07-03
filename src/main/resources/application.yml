@@ -27,3 +27,7 @@ eureka:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
   instance:
     prefer-ip-address: true
+
+service:
+  auth:
+    url: ${SERVICE_AUTH_URL:http://auth-service}
