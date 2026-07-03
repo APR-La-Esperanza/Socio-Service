@@ -1,1 +1,2 @@
-# Pago
+Socio-Service (puerto 8082, apr_socio_db)
+Responsabilidad: CRUD de socios. Valida que cada socio tenga una credencial válida en Auth. Entidad: Socio { id, rut, nombre, apellido, direccion, telefono, email, medidorNumero, activo, fechaRegistro, credencialId } Controller: SocioController — 5 endpoints Service: SocioService — métodos: listarTodos(), buscarPorId(), guardar(), actualizar(), eliminar(), validarCredencialEnAuthService() (privado) Repository: SocioRepository — custom: findByRut(), existsByRut(), existsByEmail(), existsByMedidorNumero(), existsByCredencialId() DTOs: SocioDTO, SocioResponseDTO Dependencias externas: Auth-Service → GET /auth/{id} (validar credencialId) Tabla BD: socios
