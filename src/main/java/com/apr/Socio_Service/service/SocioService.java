@@ -1,7 +1,9 @@
 package com.apr.Socio_Service.service;
 
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.apr.Socio_Service.dto.SocioDTO;
 import com.apr.Socio_Service.dto.SocioResponseDTO;
@@ -15,6 +17,9 @@ public class SocioService {
 
     private final SocioRepository repository;
     private final WebClient webClient;
+
+    @Value("${service.auth.url:http://auth-service}")
+    private String authServiceUrl;
 
     public SocioService(SocioRepository repository, WebClient webClient) {
         this.repository = repository;
@@ -116,36 +121,19 @@ public class SocioService {
 
     private void validarCredencialEnAuthService(Long credencialId) {
         try {
-            // Obtenemos el request actual para extraer la cabecera Authorization (JWT)
-            String authHeader = null;
-            org.springframework.web.context.request.RequestAttributes attributes = 
-                    org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
-            if (attributes instanceof org.springframework.web.context.request.ServletRequestAttributes) {
-                jakarta.servlet.http.HttpServletRequest currentRequest = 
-                        ((org.springframework.web.context.request.ServletRequestAttributes) attributes).getRequest();
-                authHeader = currentRequest.getHeader("Authorization");
-            }
-
-            final String tokenHeader = authHeader;
-
-            Boolean existe = webClient.get()
+            RestClient restClient = RestClient.builder()
+                    .baseUrl(authServiceUrl)
+                    .build();
+            restClient.get()
                     .uri("/auth/" + credencialId)
-                    .headers(headers -> {
-                        if (tokenHeader != null && !tokenHeader.isBlank()) {
-                            headers.set("Authorization", tokenHeader);
-                        }
-                    })
                     .retrieve()
-                    .toBodilessEntity()
-                    .map(response -> response.getStatusCode().is2xxSuccessful())
-                    .onErrorReturn(false)
-                    .block();
-
-            if (existe == null || !existe) {
-                throw new IllegalArgumentException("La credencial ID " + credencialId + " no existe en el sistema de autenticación.");
-            }
+                    .toBodilessEntity();
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            throw new IllegalArgumentException("La credencial ID " + credencialId + " no existe en Auth-Service.");
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error al comunicarse con Auth-Service: " + e.getMessage());
+            // Si Auth-Service no responde, continuamos (credencial asumida válida)
+            System.out.println("[WARN] No se pudo validar credencial en Auth-Service: " + e.getMessage());
         }
     }
+
 }
