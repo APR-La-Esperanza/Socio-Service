@@ -116,8 +116,25 @@ public class SocioService {
 
     private void validarCredencialEnAuthService(Long credencialId) {
         try {
+            // Obtenemos el request actual para extraer la cabecera Authorization (JWT)
+            String authHeader = null;
+            org.springframework.web.context.request.RequestAttributes attributes = 
+                    org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+            if (attributes instanceof org.springframework.web.context.request.ServletRequestAttributes) {
+                jakarta.servlet.http.HttpServletRequest currentRequest = 
+                        ((org.springframework.web.context.request.ServletRequestAttributes) attributes).getRequest();
+                authHeader = currentRequest.getHeader("Authorization");
+            }
+
+            final String tokenHeader = authHeader;
+
             Boolean existe = webClient.get()
                     .uri("/auth/" + credencialId)
+                    .headers(headers -> {
+                        if (tokenHeader != null && !tokenHeader.isBlank()) {
+                            headers.set("Authorization", tokenHeader);
+                        }
+                    })
                     .retrieve()
                     .toBodilessEntity()
                     .map(response -> response.getStatusCode().is2xxSuccessful())
